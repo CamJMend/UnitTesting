@@ -15,9 +15,15 @@ public class Library {
         checkedOutBooks = new HashMap<>();  
     }  
   
-    public void addBook(Book book) {  
-        books.add(book);  
-    }  
+    public boolean addBook(Book book) {
+        for (Book b : books) {
+            if (b.equals(book)) {
+                return false;
+            }
+        }
+        books.add(book);
+        return true;
+    }
   
     public void removeBook(Book book) {  
         books.remove(book);  
@@ -31,32 +37,33 @@ public class Library {
         if (books.contains(book) && !book.isCheckedOut()) {  
             book.checkOut(daysToDue);  
             checkedOutBooks.put(patron, book);  
+            patron.checkOutBook(book);
             return true;  
         }  
         return false;  
     }  
+    
   
-    public boolean returnBook(Patron patron) {  
-        Book book = checkedOutBooks.get(patron);  
-        if (book != null) {  
+    public boolean returnBook(Patron patron, Book book) {  
+        if (checkedOutBooks.get(patron) == book) {
             book.returnBook();  
             checkedOutBooks.remove(patron);  
+            patron.returnBook(book);  
             return true;  
-        }  
+        }
         return false;  
-    }  
+    }
   
-    public double calculateFine(Patron patron) {  
-        Book book = checkedOutBooks.get(patron);  
-        if (book != null && book.isCheckedOut()) {  
+    public double calculateFine(Patron patron, Book book) {  
+        if (checkedOutBooks.get(patron) == book && book.isCheckedOut()) {  
             LocalDate today = LocalDate.now();  
             long daysOverdue = ChronoUnit.DAYS.between(book.getDueDate(), today);  
             if (daysOverdue > 0) {  
-                return daysOverdue * 0.50; // $0.50 fine per day overdue  
+                return daysOverdue * 0.50;  
             }  
         }  
         return 0.0;  
-    }  
+    }    
   
     public List<Book> listAvailableBooks() {  
         List<Book> availableBooks = new ArrayList<>();  
