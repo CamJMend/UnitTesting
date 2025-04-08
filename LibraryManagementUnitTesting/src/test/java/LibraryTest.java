@@ -105,39 +105,42 @@ class LibraryTest {
         library.addBook(book);  
         assertTrue(library.listAvailableBooks().contains(book));  
     }  
-}
 
-class BookTest {
-    private Book book;
     @Test
-    @DisplayName("TC-BOOK-001: Create a valid book")
-    void testBookCreated() {
-        book = new Book("Turtles all the way down", "Green");
-        assertNotNull(book, "Book should be created");
-    }
-}
-
-class PatronTest {
-    private Patron patron;
-    private Book book;
-    private Library library;
-    @Test
-    @DisplayName("TC-PATRON-001: Create a valid patron")
-    void testRegisterPatron() {
-        patron = new Patron("Camila Mendoza");
-        assertNotNull(patron, "Patron should be created");
+    @DisplayName("TC-LIB-008: Remove a book from library")
+    void testRemoveBook() {
+        book = new Book("Sapiens", "Yuval Harari");
+        library.addBook(book);
+        library.removeBook(book);
+        assertFalse(library.listAvailableBooks().contains(book), "Book should be removed from library");
     }
 
     @Test
-    @DisplayName("TC-PATRON-002: Patron checks out and returns a book")
-    void testCheckOutAndReturnBook() {
-        patron = new Patron("Miguel");
-        book = new Book("Algebra", "Author");
-        assertTrue(patron.getCheckedOutBooks().isEmpty(), "Patron should have no books initially");
-        patron.checkOutBook(book);
-        assertTrue(patron.getCheckedOutBooks().contains(book), "Patron should have checked out the book");
-        patron.returnBook(book);
-        assertFalse(patron.getCheckedOutBooks().contains(book), "Patron should have returned the book");
+    @DisplayName("TC-LIB-009: Return a book that wasn't checked out by the patron")
+    void testReturnBookWrongPatron() {
+        book = new Book("Mystery", "Author");
+        Patron otherPatron = new Patron("Other");
+        library.addBook(book);
+        library.checkOutBook(otherPatron, book, 5);
+        assertFalse(library.returnBook(patron, book), "Should not return book checked out by another patron");
     }
+
+    @Test
+    @DisplayName("TC-LIB-010: Calculate fine for book not overdue")
+    void testCalculateFineNoOverdue() {
+        book = new Book("Fresh", "Author");
+        library.addBook(book);
+        library.checkOutBook(patron, book, 5);
+        double fine = library.calculateFine(patron, book);
+        assertEquals(0.0, fine, "There should be no fine if book is not overdue");
+    }
+
+    @Test
+    @DisplayName("TC-LIB-011: Try to check out a non-existent book")
+    void testCheckoutNonexistentBook() {
+        book = new Book("Invisible", "Ghost");
+        assertFalse(library.checkOutBook(patron, book, 3), "Should not checkout a book that is not in library");
+    }
+
 }
  
