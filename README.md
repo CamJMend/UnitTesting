@@ -1,5 +1,4 @@
 # UnitTesting
-Ana Camila Jimenez Mendoza - A01174422
 
 ### Matrix of tests
 
